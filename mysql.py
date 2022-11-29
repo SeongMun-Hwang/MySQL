@@ -1,7 +1,7 @@
 import pymysql
 #접속 정보
 con = pymysql.connect(host='192.168.228.3', user='seongmun-hwang', password='0920',
-                       db='madang', port = 4567)
+                       db='genshin', port = 4567)
  
 cur = con.cursor()
  

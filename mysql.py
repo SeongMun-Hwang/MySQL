@@ -8,8 +8,7 @@ cur = con.cursor()
 #sql문 실행 함수
 def execute_sql(str):
     cur.execute(str)
-    rows = cur.fetchall()
-    print(rows)
+    print(cur.fetchall())
     con.commit()
     print("\n")
 
@@ -75,8 +74,8 @@ while True :
             #보유 캐릭터 등록
             if char_num == '1':
                 uid=input("캐릭터를 추가하려는 사용자 유아이디를 입력해 주세요: ")
-                character, weapon, relic=input("추가하려는 캐릭터, 무기, 성유물 이름을 입력해주세요: ").split(',')
-                sql="INSERT 보유_캐릭터 SET 유아이디="+uid+",캐릭터_이름='"+character+"',무기_이름='"+weapon+"',성유물_이름='"+relic+"';"
+                character, level, weapon, relic=input("추가하려는 캐릭터, 레벨, 무기, 성유물 이름을 입력해주세요: ").split(',')
+                sql="INSERT 보유_캐릭터 SET 유아이디="+uid+",캐릭터_이름='"+character+"',레벨="+level+",무기_이름='"+weapon+"',성유물_이름='"+relic+"';"
                 execute_sql(sql)
                 
             #보유 캐릭터 수정
@@ -104,8 +103,14 @@ while True :
                 sql="UPDATE 보유_캐릭터 SET \
                 공격력=(SELECT 무기_공격력 FROM 무기 WHERE 무기_이름=보유_캐릭터.무기_이름) \
                 + (SELECT 성유물_공격력 FROM 성유물 WHERE 성유물_이름=보유_캐릭터.성유물_이름)\
+                + (SELECT 캐릭터_공격력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)\
+                + (SELECT 성장_공격력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)*레벨\
                 ,방어력 = (SELECT 성유물_방어력 FROM 성유물 WHERE 성유물_이름=보유_캐릭터.성유물_이름)\
+                + (SELECT 캐릭터_방어력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)\
+                + (SELECT 성장_방어력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)*레벨\
                 ,체력 = (SELECT 성유물_체력 FROM 성유물 WHERE 성유물_이름=보유_캐릭터.성유물_이름)\
+                + (SELECT 캐릭터_체력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)\
+                + (SELECT 성장_체력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)*레벨\
                 WHERE 유아이디="+uid+" AND 캐릭터_이름='"+character+"';"
                 execute_sql(sql)
                 
@@ -113,6 +118,7 @@ while True :
                 break
             
     elif func == '3':
+        print("bye")
         break
                     
 con.close()

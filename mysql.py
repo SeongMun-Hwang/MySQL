@@ -43,6 +43,7 @@ while True :
         
     elif num == '10': break
 
+    con.commit()
     
 con.close()
 

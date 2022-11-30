@@ -5,6 +5,8 @@ con = pymysql.connect(host='192.168.228.3', user='seongmun-hwang', password='092
  
 cur = con.cursor()
 
+global uid
+
 #sql문 실행 함수
 def execute_sql(str):
     cur.execute(str)
@@ -60,6 +62,14 @@ while True :
         
     #캐릭터 기능 선택
     elif func == '2':
+        uid=input("본인의 유아이디를 입력해주세요: ")
+        sql="SELECT 유아이디 FROM 사용자 WHERE EXISTS(SELECT * FROM 사용자 WHERE 유아이디="+uid+");"
+        cur.execute(sql)
+        if cur.execute(sql)==0:
+            print("등록되지 않은 사용자입니다.")
+            break;
+        print(uid)
+        
         while True:
             print("캐릭터 메뉴")
             print("1. 보유 캐릭터 등록")
@@ -73,32 +83,27 @@ while True :
             print("\n")
             #보유 캐릭터 등록
             if char_num == '1':
-                uid=input("캐릭터를 추가하려는 사용자 유아이디를 입력해 주세요: ")
                 character, level, weapon, relic=input("추가하려는 캐릭터, 레벨, 무기, 성유물 이름을 입력해주세요: ").split(',')
                 sql="INSERT 보유_캐릭터 SET 유아이디="+uid+",캐릭터_이름='"+character+"',레벨="+level+",무기_이름='"+weapon+"',성유물_이름='"+relic+"';"
                 execute_sql(sql)
                 
             #보유 캐릭터 수정
             elif char_num == '2':
-                uid=input("캐릭터를 수정할 사용자 유아이디를 입력해 주세요: ")
                 character, weapon, relic=input("수정할 캐릭터, 무기, 성유물 이름을 입력해주세요: ").split(',')
-                sql="UPDATE 보유_캐릭터 SET 유아이디="+uid+",캐릭터_이름='"+character+"',무기_이름='"+weapon+"',성유물_이름='"+relic+"';"
+                sql="UPDATE 보유_캐릭터 SET 무기_이름='"+weapon+"',성유물_이름='"+relic+"' WHERE 유아이디="+uid+" AND 캐릭터_이름='"+character+"';"
                 execute_sql(sql)
                 
             #보유 캐릭터 조회
             elif char_num == '3':
-                uid=input("캐릭터를 조회할 사용자 유아이디를 입력해 주세요: ")
                 sql="SELECT * FROM 보유_캐릭터 WHERE 유아이디="+uid+";"
                 execute_sql(sql)
                 
             elif char_num == '4':
-                uid=input("캐릭터를 삭제할 사용자 유아이디를 입력해 주세요: ")
                 character = input("삭제할 캐릭터 이름을 입력해 주세요: ")
                 sql="DELETE FROM 보유_캐릭터 WHERE 유아이디="+uid+" AND 캐릭터_이름='"+character+"';"
                 execute_sql(sql)
                 
             elif char_num == '5':
-                uid=input("사용자 유아이디를 입력해 주세요: ")
                 character = input("스탯을 계산할 캐릭터 이름을 입력해 주세요: ")
                 sql="UPDATE 보유_캐릭터 SET \
                 공격력=(SELECT 무기_공격력 FROM 무기 WHERE 무기_이름=보유_캐릭터.무기_이름) \

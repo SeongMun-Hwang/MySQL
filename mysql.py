@@ -104,8 +104,8 @@ while True :
                 
             #보유 캐릭터 수정
             elif char_num == '2':
-                character, weapon, relic=input("수정할 캐릭터, 무기, 성유물 이름을 입력해주세요: ").split(',')
-                sql="UPDATE 보유_캐릭터 SET 무기_이름='"+weapon+"',성유물_이름='"+relic+"' WHERE 유아이디="+uid+" AND 캐릭터_이름='"+character+"';"
+                character, weapon, relic=input("수정할 캐릭터, 레벨, 무기, 성유물 이름을 입력해주세요: ").split(',')
+                sql="UPDATE 보유_캐릭터 SET 무기_이름='"+weapon+"',레벨="+level+"',성유물_이름='"+relic+"' WHERE 유아이디="+uid+" AND 캐릭터_이름='"+character+"';"
                 execute_sql(sql)
                 cal_status(character)
                 

@@ -28,8 +28,20 @@ def cal_status(c_name):
     + (SELECT 성장_체력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)*레벨\
     WHERE 유아이디="+uid+" AND 캐릭터_이름='"+c_name+"';"
     execute_sql(sql)
-
-
+    
+def check_exist(table, attr, what) :
+    sql="SELECT * FROM "+table+" WHERE EXISTS(SELECT * FROM "+table+" WHERE "+attr+"='"+what+"');"
+    if cur.execute(sql)==0:
+        print("등록되지 않은",table,"입니다.\n")
+        return 0
+    
+def check_character_all(name, weapon, relic):
+    x=check_exist('캐릭터', '캐릭터_이름', name)
+    y=check_exist('무기', '무기_이름', weapon)
+    z=check_exist('성유물', '성유물_이름', relic)
+    if x==0 or y==0 or z==0:
+        return 0
+    
 while True :
     print("1. 유저   2. 캐릭터   3.종료")
     func=input("사용할 기능을 선택하세요: ")
@@ -76,16 +88,13 @@ while True :
                 break
         
     #캐릭터 기능 선택
-    elif func == '2':
-        uid=input("본인의 유아이디를 입력해주세요: ")
-        sql="SELECT 유아이디 FROM 사용자 WHERE EXISTS(SELECT * FROM 사용자 WHERE 유아이디="+uid+");"
-        cur.execute(sql)
-        if cur.execute(sql)==0:
-            print("등록되지 않은 사용자입니다.")
-            break;
-        print(uid)
-        
+    elif func == '2':     
         while True:
+            uid=input("본인의 유아이디를 입력해주세요: ")
+            if check_exist('사용자','유아이디',uid)!=0:
+                break
+       
+        while True:           
             print("캐릭터 메뉴")
             print("1. 보유 캐릭터 등록")
             print("2. 보유 캐릭터 수정")
@@ -99,14 +108,17 @@ while True :
             if char_num == '1':
                 character, level, weapon, relic=input("추가하려는 캐릭터, 레벨, 무기, 성유물 이름을 입력해주세요: ").split(',')
                 sql="INSERT 보유_캐릭터 SET 유아이디="+uid+",캐릭터_이름='"+character+"',레벨="+level+",무기_이름='"+weapon+"',성유물_이름='"+relic+"';"
+                if check_character_all(character, weapon, relic)==0:
+                    break
                 execute_sql(sql)
                 cal_status(character)
                 
             #보유 캐릭터 수정
             elif char_num == '2':
-
                 character, weapon, relic=input("수정할 캐릭터, 레벨, 무기, 성유물 이름을 입력해주세요: ").split(',')
                 sql="UPDATE 보유_캐릭터 SET 무기_이름='"+weapon+"',레벨="+level+"',성유물_이름='"+relic+"' WHERE 유아이디="+uid+" AND 캐릭터_이름='"+character+"';"
+                if check_character_all(character, weapon, relic)==0:
+                    break
                 execute_sql(sql)
                 cal_status(character)
                 
@@ -122,8 +134,8 @@ while True :
                 execute_sql(sql)                
                 
             elif char_num == '5':
-                break
-            
+                break                
+                      
     elif func == '3':
         print("bye")
         break

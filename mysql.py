@@ -13,6 +13,21 @@ def execute_sql(str):
     print(cur.fetchall())
     con.commit()
     print("\n")
+    
+def cal_status(c_name):
+    sql="UPDATE 보유_캐릭터 SET \
+    공격력=(SELECT 무기_공격력 FROM 무기 WHERE 무기_이름=보유_캐릭터.무기_이름) \
+    + (SELECT 성유물_공격력 FROM 성유물 WHERE 성유물_이름=보유_캐릭터.성유물_이름)\
+    + (SELECT 캐릭터_공격력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)\
+    + (SELECT 성장_공격력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)*레벨\
+    ,방어력 = (SELECT 성유물_방어력 FROM 성유물 WHERE 성유물_이름=보유_캐릭터.성유물_이름)\
+    + (SELECT 캐릭터_방어력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)\
+    + (SELECT 성장_방어력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)*레벨\
+    ,체력 = (SELECT 성유물_체력 FROM 성유물 WHERE 성유물_이름=보유_캐릭터.성유물_이름)\
+    + (SELECT 캐릭터_체력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)\
+    + (SELECT 성장_체력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)*레벨\
+    WHERE 유아이디="+uid+" AND 캐릭터_이름='"+c_name+"';"
+    execute_sql(sql)
 
 
 while True :
@@ -76,8 +91,7 @@ while True :
             print("2. 보유 캐릭터 수정")
             print("3. 보유 캐릭터 조회")
             print("4. 보유 캐릭터 삭제")
-            print("5. 캐릭터 스탯 계산")
-            print("6. 종료")
+            print("5. 종료")
             print("!입력이 여러 개일시 ,를 사용하세요!")
             char_num=input("원하시는 기능을 선택하세요: ")
             print("\n")
@@ -86,40 +100,27 @@ while True :
                 character, level, weapon, relic=input("추가하려는 캐릭터, 레벨, 무기, 성유물 이름을 입력해주세요: ").split(',')
                 sql="INSERT 보유_캐릭터 SET 유아이디="+uid+",캐릭터_이름='"+character+"',레벨="+level+",무기_이름='"+weapon+"',성유물_이름='"+relic+"';"
                 execute_sql(sql)
+                cal_status(character)
                 
             #보유 캐릭터 수정
             elif char_num == '2':
                 character, weapon, relic=input("수정할 캐릭터, 무기, 성유물 이름을 입력해주세요: ").split(',')
                 sql="UPDATE 보유_캐릭터 SET 무기_이름='"+weapon+"',성유물_이름='"+relic+"' WHERE 유아이디="+uid+" AND 캐릭터_이름='"+character+"';"
                 execute_sql(sql)
+                cal_status(character)
                 
             #보유 캐릭터 조회
             elif char_num == '3':
                 sql="SELECT * FROM 보유_캐릭터 WHERE 유아이디="+uid+";"
                 execute_sql(sql)
                 
+            #보유 캐릭터 삭제
             elif char_num == '4':
                 character = input("삭제할 캐릭터 이름을 입력해 주세요: ")
                 sql="DELETE FROM 보유_캐릭터 WHERE 유아이디="+uid+" AND 캐릭터_이름='"+character+"';"
-                execute_sql(sql)
+                execute_sql(sql)                
                 
             elif char_num == '5':
-                character = input("스탯을 계산할 캐릭터 이름을 입력해 주세요: ")
-                sql="UPDATE 보유_캐릭터 SET \
-                공격력=(SELECT 무기_공격력 FROM 무기 WHERE 무기_이름=보유_캐릭터.무기_이름) \
-                + (SELECT 성유물_공격력 FROM 성유물 WHERE 성유물_이름=보유_캐릭터.성유물_이름)\
-                + (SELECT 캐릭터_공격력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)\
-                + (SELECT 성장_공격력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)*레벨\
-                ,방어력 = (SELECT 성유물_방어력 FROM 성유물 WHERE 성유물_이름=보유_캐릭터.성유물_이름)\
-                + (SELECT 캐릭터_방어력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)\
-                + (SELECT 성장_방어력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)*레벨\
-                ,체력 = (SELECT 성유물_체력 FROM 성유물 WHERE 성유물_이름=보유_캐릭터.성유물_이름)\
-                + (SELECT 캐릭터_체력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)\
-                + (SELECT 성장_체력 FROM 캐릭터 WHERE 캐릭터_이름=보유_캐릭터.캐릭터_이름)*레벨\
-                WHERE 유아이디="+uid+" AND 캐릭터_이름='"+character+"';"
-                execute_sql(sql)
-                
-            elif char_num == '6':
                 break
             
     elif func == '3':

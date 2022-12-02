@@ -14,6 +14,7 @@ def execute_sql(str):
     con.commit()
     print("\n")
     
+#캐릭터 스탯계산 함수 : 캐릭터, 무기, 성유물 테이블의 레코드에 근거해 계산
 def cal_status(c_name):
     sql="UPDATE 보유_캐릭터 SET \
     공격력=(SELECT 무기_공격력 FROM 무기 WHERE 무기_이름=보유_캐릭터.무기_이름) \
@@ -29,12 +30,14 @@ def cal_status(c_name):
     WHERE 유아이디="+uid+" AND 캐릭터_이름='"+c_name+"';"
     execute_sql(sql)
     
+#존재 여부 확인 함수 : 테이블 이름, 특성 이름, 존재 여부를 확인할 이름을 입력받아 존재하지 않으면 0리턴
 def check_exist(table, attr, what) :
     sql="SELECT * FROM "+table+" WHERE EXISTS(SELECT * FROM "+table+" WHERE "+attr+"='"+what+"');"
     if cur.execute(sql)==0:
         print("등록되지 않은",table,"입니다.\n")
         return 0
     
+#캐릭터 이름/무기/성유물 확인 함수 : check_exist * 3, 하나라도 존재하지 않으면 0 리턴
 def check_character_all(name, weapon, relic):
     x=check_exist('캐릭터', '캐릭터_이름', name)
     y=check_exist('무기', '무기_이름', weapon)
@@ -42,10 +45,11 @@ def check_character_all(name, weapon, relic):
     if x==0 or y==0 or z==0:
         return 0
     
+#메인 메뉴
 while True :
     print("1. 유저   2. 캐릭터   3.종료 \n4.캐릭터,무기,성유물 조회")
     func=input("사용할 기능을 선택하세요: ")
-    #유저 기능 선택
+    #유저 기능 메뉴
     if func == '1':
         while True :
             print("유저 메뉴")
@@ -102,7 +106,7 @@ while True :
             else :
                 print("잘못된 입력입니다.\n")
         
-    #캐릭터 기능 선택
+    #캐릭터 기능 메뉴
     elif func == '2':     
         while True:
             uid=input("본인의 유아이디를 입력해주세요: ")
@@ -163,11 +167,12 @@ while True :
             
             else :
                 print("잘못된 입력입니다.\n")                
-                      
+    #종료
     elif func == '3':
         print("bye")
         break
     
+    #캐릭터/무기/성유물 이름만 출력
     elif func== '4':
         sql="SELECT 캐릭터_이름 FROM 캐릭터"
         execute_sql(sql)
